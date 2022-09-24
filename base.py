@@ -1,4 +1,8 @@
 import os
+import pandas as pd
+import readCsv as rc
+import modelai
+from tensorflow.keras.layers import Dense
 
 RESET = "\u001B[0m"
 BLACK = "\u001B[30m"
@@ -22,8 +26,27 @@ WHITE_BOLD = "\033[1;37m"
 def colorize(text, color):
     return color + text + RESET
 
+in_shape, out_shape = None, None
+advanced = None
+
+def setIO():
+    global in_shape, out_shape
+    in_shape = int(input("input shape (no. of input parameters)?"))
+    out_shape = int(input("output shape (no. of categories)?"))
+
+
 def mainLoop():
+    global apiModel
     name = "model"
+    if(in_shape == None or out_shape == None):
+        setIO()
+    elif(advanced == None):
+        x = input("Advanced mode? (0 for advanced, 1 for beginner mode) (advanced lets you make your own model)")
+        if(x == "1"):
+            advanced = False
+        else:
+            advanced = True
+
     try:
         categories = int(input("How many categories? "))
     except ValueError:
@@ -31,14 +54,17 @@ def mainLoop():
         mainLoop()
     csv = input(colorize("Enter the name of the CSV file: ", BLUE))
     # Do stuff with the CSV file, PARSE IT HERE
+    try:
+        rc.readCsv(csv)
+        rc.toHotEncode(csv)
+    except:
+        print(colorize("You bozo, that file doesn't exist or is just plain empty. Please actually get good next time bro im spending my tax money on this please send helo in bit jijug", RED))
+        mainLoop()
     
-    x = input(colorize("What do you want to do? (+ for add layer, - for subtract layer", YELLOW))
+    x = input(colorize("What do you want to do? (+ for add layer, - for subtract layer) ", YELLOW))
     if x == "+":
-        try:
-            howmany = int(input(colorize("How many layers do you want to add? ", YELLOW)))
-        except ValueError:
-            print(colorize("Please enter a number.", RED))
-            mainLoop()
+        outneurons = int(input(colorize("How may output neurons?", BLUE)))
+        activation = input(colorize("Activation function? ", BLUE))
     elif x == "-":
         try:
             howmany = int(input(colorize("How many layers do you want to add? ", YELLOW)))
