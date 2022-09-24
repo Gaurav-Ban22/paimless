@@ -1,9 +1,13 @@
+
+
 import os
 import pandas as pd
 import readCsv as rc
 import modelapi
 import templates
-from tensorflow.keras.layers import Dense
+import tensorflow
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.models import Sequential
 
 RESET = "\u001B[0m"
 BLACK = "\u001B[30m"
@@ -49,9 +53,17 @@ def mainLoop():
             advanced = False
         else:
             advanced = True
+            layers.append(Input(in_shape))
 
     if(advanced):
-        pass
+        action = input("[a]dd hidden layer, [b]egin")
+        if(action == "a"):
+            out_neurons = int(input("output neurons?"))
+            activation = input("activation function?")            
+            layers.append(Dense(out_neurons, activation=activation))
+            mainLoop()
+        if(action == "b"):
+            layers.append(Dense(out_shape, activation="sigmoid"))
     else:
         print("what template do you want to use? (classifier_small[1], classifier_large[2])")
         template = input()
@@ -64,6 +76,8 @@ def mainLoop():
 mainLoop()
 
 x_train, y_train = None, None
+
+apiModel.model = Sequential(layers)
 
 def csvProcess():
     global x_train, y_train
@@ -83,20 +97,18 @@ def train():
 
     apiModel.train(x_train, y_train, batch_size=batch_size, epochs=epochs)
 
-apiModel.model.save("model.h5")
+train()
+apiModel.model.save("saveData/model.h5")
 
 def secure():
     whether = input("Do you want to host this on a semisecure webserver? Press ctrl-c to stop hosting when you're done. (y/n) ")
     if whether == "y":
-        os.system("python3 -m http.server 8000")
+        os.system("cd saveData && python3 -m httpServer.py 8000")
     if whether == "n":
         print("rip")
     else:
         print("invalid input")
         secure()
 
-train()
-
-
-
-    
+secure()
+   
