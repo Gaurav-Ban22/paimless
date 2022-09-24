@@ -76,6 +76,14 @@ def csvProcess():
 
 csvProcess()
 
+def train():
+    #if(advanced):
+    batch_size = int(input("batch size: "))
+    epochs = int(input("epochs (number of iterations on one dataset): "))
+
+    apiModel.train(x_train, y_train, batch_size=batch_size, epochs=epochs)
+
+train()
 
 
 
