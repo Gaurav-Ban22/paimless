@@ -35,6 +35,10 @@ class selfHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(bytes("<html><head><title>Title goes here.</title></head>", "utf-8"))
         self.wfile.write(bytes("<body><p>This is a test.</p></body></html>", "utf-8"))
         self.wfile.close()
+    def do_POST(self):
+        body_inf = int(self.headers.get('Content-Length'))
+        body = self.rfile.read(body_inf)
+        
 
 try:
     serv = httpServer(8000, selfHandler)
