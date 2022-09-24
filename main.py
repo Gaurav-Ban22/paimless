@@ -3,7 +3,8 @@ import pandas as pd
 import readCsv as rc
 import modelapi
 import templates
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.models import Sequential
 
 RESET = "\u001B[0m"
 BLACK = "\u001B[30m"
@@ -49,14 +50,17 @@ def mainLoop():
             advanced = False
         else:
             advanced = True
+            layers.append(Input(in_shape))
 
     if(advanced):
-        action = input("[a]dd layer, [b]egin")
+        action = input("[a]dd hidden layer, [b]egin")
         if(action == "a"):
             out_neurons = int(input("output neurons?"))
-            activation = input("activation function?")
-            
-
+            activation = input("activation function?")            
+            layers.append(Dense(out_neurons, activation=activation))
+            mainLoop()
+        if(action == "b"):
+            layers.append(Dense(out_shape, activation="sigmoid"))
     else:
         print("what template do you want to use? (classifier_small[1], classifier_large[2])")
         template = input()
@@ -69,6 +73,8 @@ def mainLoop():
 mainLoop()
 
 x_train, y_train = None, None
+
+apiModel.model = Sequential(layers)
 
 def csvProcess():
     global x_train, y_train
