@@ -51,7 +51,12 @@ def mainLoop():
             advanced = True
 
     if(advanced):
-        pass
+        action = input("[a]dd layer, [b]egin")
+        if(action == "a"):
+            out_neurons = int(input("output neurons?"))
+            activation = input("activation function?")
+            
+
     else:
         print("what template do you want to use? (classifier_small[1], classifier_large[2])")
         template = input()
@@ -83,6 +88,7 @@ def train():
 
     apiModel.train(x_train, y_train, batch_size=batch_size, epochs=epochs)
 
+train()
 apiModel.model.save("model.h5")
 
 def secure():
@@ -95,8 +101,4 @@ def secure():
         print("invalid input")
         secure()
 
-train()
-
-
-
-    
+secure()
