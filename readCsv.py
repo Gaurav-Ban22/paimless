@@ -28,5 +28,3 @@ def readInputs(csv, output):
         raise ValueError("bruh u need to actually have that")
 
 #print(toHotEncodes("iris.csv", "variety"))
-
-
