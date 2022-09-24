@@ -83,6 +83,8 @@ def train():
 
     apiModel.train(x_train, y_train, batch_size=batch_size, epochs=epochs)
 
+apiModel.model.save("model.h5")
+
 train()
 
 
