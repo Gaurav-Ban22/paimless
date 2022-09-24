@@ -15,3 +15,4 @@ def classifier_large(in_shape, out_shape):
         tf.keras.layers.Dense(32, activation="leaky_relu"),
         tf.keras.layers.Dense(out_shape, activation="sigmoid")
     ])
+
