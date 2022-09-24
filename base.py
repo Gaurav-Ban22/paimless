@@ -1,5 +1,7 @@
 import os
-import modelapi
+import pandas as pd
+import readCsv as rc
+import modelai
 from tensorflow.keras.layers import Dense
 
 RESET = "\u001B[0m"
@@ -32,10 +34,10 @@ def setIO():
     in_shape = int(input("input shape (no. of input parameters)?"))
     out_shape = int(input("output shape (no. of categories)?"))
 
+
 def mainLoop():
     global apiModel
     name = "model"
-
     if(in_shape == None or out_shape == None):
         setIO()
     elif(advanced == None):
@@ -56,19 +58,17 @@ def mainLoop():
         mainLoop()
     csv = input(colorize("Enter the name of the CSV file: ", BLUE))
     # Do stuff with the CSV file, PARSE IT HERE
+    try:
+        rc.readCsv(csv)
+        rc.toHotEncode(csv)
+    except:
+        print(colorize("You bozo, that file doesn't exist or is just plain empty. Please actually get good next time bro im spending my tax money on this please send helo in bit jijug", RED))
+        mainLoop()
     
-    x = input(colorize("What do you want to do? (+ for add layer, - for subtract layer)", YELLOW))
+    x = input(colorize("What do you want to do? (+ for add layer, - for subtract layer) ", YELLOW))
     if x == "+":
-        outneurons = int(input(colorize("How many output neurons?", BLUE)))
+        outneurons = int(input(colorize("How may output neurons?", BLUE)))
         activation = input(colorize("Activation function? ", BLUE))
-
-        """
-        try:
-            howmany = int(input(colorize("How many layers do you want to add? ", YELLOW)))
-        except ValueError:
-            print(colorize("Please enter a number.", RED))
-            mainLoop()
-        """
     elif x == "-":
         try:
             howmany = int(input(colorize("How many layers do you want to add? ", YELLOW)))
