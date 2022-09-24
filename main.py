@@ -85,6 +85,16 @@ def train():
 
 apiModel.model.save("model.h5")
 
+def secure():
+    whether = input("Do you want to host this on a semisecure webserver? Press ctrl-c to stop hosting when you're done. (y/n) ")
+    if whether == "y":
+        os.system("python3 -m http.server 8000")
+    if whether == "n":
+        print("rip")
+    else:
+        print("invalid input")
+        secure()
+
 train()
 
 
