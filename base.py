@@ -1,8 +1,10 @@
 import os
 import pandas as pd
 import readCsv as rc
-import modelai
-from tensorflow.keras.layers import Dense
+import modelapi
+import tensorflow
+from keras.layers import Dense
+
 
 RESET = "\u001B[0m"
 BLACK = "\u001B[30m"
