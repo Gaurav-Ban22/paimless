@@ -66,11 +66,17 @@ mainLoop()
 x_train, y_train = None, None
 
 def csvProcess():
+    global x_train, y_train
     path = input("path to csv: ")
     out = input("output column in csv: ")
 
     y_train = rc.toHotEncodes(path, out)
     x_train = rc.readInputs(path, out)
+
+
+csvProcess()
+
+
 
 
     
