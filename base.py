@@ -1,4 +1,6 @@
 import os
+import modelapi
+from tensorflow.keras.layers import Dense
 
 RESET = "\u001B[0m"
 BLACK = "\u001B[30m"
@@ -22,8 +24,31 @@ WHITE_BOLD = "\033[1;37m"
 def colorize(text, color):
     return color + text + RESET
 
+in_shape, out_shape = None, None
+advanced = None
+
+def setIO():
+    global in_shape, out_shape
+    in_shape = int(input("input shape (no. of input parameters)?"))
+    out_shape = int(input("output shape (no. of categories)?"))
+
 def mainLoop():
+    global apiModel
     name = "model"
+
+    if(in_shape == None or out_shape == None):
+        setIO()
+    elif(advanced == None):
+        x = input("Advanced mode? (0 for advanced, 1 for beginner mode) (advanced lets you make your own model)")
+        if(x == "1"):
+            advanced = False
+        else:
+            advanced = True
+
+    if(advanced):
+        pass
+    else:
+        print("what template do you want to use?")
     try:
         categories = int(input("How many categories? "))
     except ValueError:
@@ -32,13 +57,18 @@ def mainLoop():
     csv = input(colorize("Enter the name of the CSV file: ", BLUE))
     # Do stuff with the CSV file, PARSE IT HERE
     
-    x = input(colorize("What do you want to do? (+ for add layer, - for subtract layer", YELLOW))
+    x = input(colorize("What do you want to do? (+ for add layer, - for subtract layer)", YELLOW))
     if x == "+":
+        outneurons = int(input(colorize("How many output neurons?", BLUE)))
+        activation = input(colorize("Activation function? ", BLUE))
+
+        """
         try:
             howmany = int(input(colorize("How many layers do you want to add? ", YELLOW)))
         except ValueError:
             print(colorize("Please enter a number.", RED))
             mainLoop()
+        """
     elif x == "-":
         try:
             howmany = int(input(colorize("How many layers do you want to add? ", YELLOW)))
