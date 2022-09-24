@@ -56,7 +56,7 @@ def mainLoop():
     # Do stuff with the CSV file, PARSE IT HERE
     try:
         rc.readCsv(csv)
-        rc.toHotEncode(csv)
+        #print(str(rc.toHotEncode(csv)))
     except:
         print(colorize("You bozo, that file doesn't exist or is just plain empty. Please actually get good next time bro im spending my tax money on this please send helo in bit jijug", RED))
         mainLoop()
