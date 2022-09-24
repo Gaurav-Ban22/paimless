@@ -4,20 +4,29 @@ import socketserver
 
 
 class httpServer:
-    def __init__(self, port=8080):
+    def __init__(self, port=8000, handler=None):
         self.port = port
         self.server = None
-        self.handler = None
+        self.handler = handler
 
     def start(self):
-        self.handler = http.server.SimpleHTTPRequestHandler
-        self.server = socketserver.TCPServer(("", self.port), self.handler)
-        self.server.serve_forever()
+        if self.handler == None:
+            self.handler = http.server.BaseHTTPRequestHandler
+        else:
+            self.server = http.server.HTTPServer(("", self.port), self.handler)
+            self.server.serve_forever()
 
     def stop(self):
         self.server.shutdown()
         self.server.socket.close()
 
+
+
+class selfHandler(http.server.BaseHTTPRequestHandler):
+    def do_HEAD(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
@@ -27,9 +36,8 @@ class httpServer:
         self.wfile.write(bytes("<body><p>This is a test.</p></body></html>", "utf-8"))
         self.wfile.close()
 
-
 try:
-    serv = httpServer(8000)
+    serv = httpServer(8000, selfHandler)
     serv.start()
 except KeyboardInterrupt:
     print(" Keyboard interrupt; stopping server")
