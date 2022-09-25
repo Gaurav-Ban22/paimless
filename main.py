@@ -1,5 +1,7 @@
 
 
+from ast import fix_missing_locations
+from optparse import BadOptionError
 import os
 import pandas as pd
 import readCsv as rc
@@ -8,6 +10,7 @@ import templates
 import tensorflow
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Sequential
+import tkinter as tk
 
 RESET = "\u001B[0m"
 BLACK = "\u001B[30m"
@@ -27,6 +30,21 @@ PURPLE_BOLD = "\033[1;35m"
 CYAN_BOLD = "\033[1;36m"
 WHITE_BOLD = "\033[1;37m"
 
+finalOut = 0
+finalIn = 0
+finalPath = ""
+finalBatches = 0 
+finalEpochs = 0
+howManyNeurons = 0
+activationFunc = "sigmoid"
+outputNeurons = 0
+finalColumn = ""
+
+isSimple = True
+
+wind = tk.Tk()
+wind.title("Paimless Neural Network Generator")
+wind.geometry('500x600')
 
 def colorize(text, color):
     return color + text + RESET
@@ -36,84 +54,343 @@ advanced = None
 layers = []
 apiModel = modelapi.APIModel([])
 
-def setIO():
-    global in_shape, out_shape
-    in_shape = int(input("input shape (no. of input parameters)?"))
-    out_shape = int(input("output shape (no. of categories)?"))
+def switch():
+    global isSimple
+    isSimple = not isSimple
+
+inputs = tk.Label(wind, text="Input shape (no. of input parameters)?")
+inputs.pack()
+
+inputEntry = tk.Entry(wind)
+inputEntry.pack()
+
+outputs = tk.Label(wind, text="Output shape (no. of categories)?")
+outputs.pack()
+
+outputEntry = tk.Entry(wind)
+outputEntry.pack()
+
+chooseTemplate = tk.Button(wind, text="Switch template (starts at simple)", command=switch)
+chooseTemplate.pack()
+
+patho = tk.Label(wind, text="Path to csv: ")
+patho.pack()
+
+pathoText = tk.Entry(wind)
+pathoText.pack()
+
+op = tk.Label(wind, text="Output column: ")
+op.pack()
+
+opt = tk.Entry(wind)
+opt.pack()
+
+bat = tk.Label(wind, text="Batches: ")
+bat.pack()
+
+bate = tk.Entry(wind)
+bate.pack()
+
+epo = tk.Label(wind, text="Epoch #: ")
+epo.pack()
+
+epoe = tk.Entry(wind)
+epoe.pack()
+
+howMany = tk.Label(wind, text="How many hidden layers?")
+howMany.pack()
+howManyText = tk.Entry(wind)
+howManyText.pack()
+
+act = tk.Label(wind, text="Activation function: ")
+act.pack()
+
+acte = tk.Entry(wind)
+acte.pack()
 
 
-def mainLoop():
-    global apiModel, advanced
-    name = "model"
-    if(in_shape == None or out_shape == None):
-        setIO()
-    if(advanced == None):
-        x = input("Advanced mode? (0 for advanced, 1 for beginner mode) (advanced lets you make your own model)")
-        if(x == "1"):
+outN = tk.Label(wind, text="How many output neurons")
+outN.pack()
+
+outNT = tk.Entry(wind)
+outNT.pack()
+def finish():
+    global finalOut, finalIn, finalPath, finalBatches, finalEpochs, howManyNeurons, activationFunc, outputNeurons, finalColumn, in_shape, out_shape, advanced, layers, apiModel
+    finalOut = outputEntry.get()
+    finalIn = inputEntry.get()
+    finalPath = pathoText.get()
+    finalBatches = bate.get()
+    finalEpochs = epoe.get()
+    howManyNeurons = howManyText.get()
+    activationFunc = acte.get()
+    finalColumn = opt.get()
+    outputNeurons = outNT.get()
+
+    def setIO():
+        global in_shape, out_shape  
+        in_shape = int(finalIn)
+        out_shape = int(finalOut)
+
+    def mainLoop():
+        global apiModel, advanced
+        name = "model"
+        if(in_shape == None or out_shape == None):
+            setIO()
+        if(advanced == None):
             advanced = False
-        else:
-            advanced = True
+        if(advanced == True):
             layers.append(Input(in_shape))
-            apiModel.model = Sequential(layers)
-
-    if(advanced):
-        action = input("[a]dd hidden layer, [b]egin")
-        if(action == "a"):
-            out_neurons = int(input("output neurons?"))
-            activation = input("activation function?")            
-            layers.append(Dense(out_neurons, activation=activation))
-            mainLoop()
-        if(action == "b"):
-            layers.append(Dense(out_shape, activation="sigmoid"))
-    else:
-        print("what template do you want to use? (classifier_small[1], classifier_large[2])")
-        template = input()
-        if(template == "1"):
-            apiModel.model = templates.classifier_small(in_shape, out_shape)
-        if(template == "2"):
-            apiModel.model = templates.classifier_large(in_shape, out_shape)
 
 
-mainLoop()
+        if(advanced):
+            action = int(howManyNeurons)
+            if(action > 0):
+                out_neurons = int(outputNeurons)
+                activation = activationFunc            
+                layers.append(Dense(out_neurons, activation=activation))
+                mainLoop()
+            if(action <= 0):
+                layers.append(Dense(out_shape, activation="sigmoid"))
+                apiModel.model = Sequential(layers) 
+        else:
+            
+            if(isSimple):
+                apiModel.model = templates.classifier_small(in_shape, out_shape)
+            if(not isSimple):
+                apiModel.model = templates.classifier_large(in_shape, out_shape)
 
-x_train, y_train = None, None
 
-def csvProcess():
-    global x_train, y_train
-    path = input("path to csv: ")
-    out = input("output column in csv: ")
+    mainLoop()
 
-    y_train = rc.toHotEncodes(path, out)
-    x_train = rc.readInputs(path, out)
+    x_train, y_train = None, None
+
+    def csvProcess():
+        global x_train, y_train
+        path = finalPath
+        out = finalColumn
+        print(colorize(path, RED))
+        print(colorize(out, RED))
+
+        y_train = rc.toHotEncodes(path, out)
+        x_train = rc.readInputs(path, out)
 
 
-csvProcess()
+    csvProcess()
 
-def train():
-    #if(advanced):
-    batch_size = int(input("batch size: "))
-    epochs = int(input("epochs (number of iterations on one dataset): "))
+    def train():
+        global x_train, y_train
+        #if(advanced):
+        batch_size = int(finalBatches)
+        epochs = int(finalEpochs)
 
-    apiModel.train(x_train, y_train, batch_size=batch_size, epochs=epochs)
+        apiModel.train(x_train, y_train, batch_size=batch_size, epochs=epochs)
+        print("training done")
 
-train()
+    train()
+    print("training done")
 
-co = os.listdir(os.getcwd() + "/" + "saveData")
+    co = os.listdir(os.getcwd() + "/" + "saveData")
 
-for i in co:
-    if i != "httpServer.py":
-        os.remove(os.getcwd()+"/"+"saveData/"+i)
+    for i in co:
+        if i != "httpServer.py":
+            os.remove(os.getcwd()+"/"+"saveData/"+i)
+                
+    apiModel.model.save("saveData/model.h5")
+
+
+    
+
+    def secure():
+        whether = input("Do you want to host this on a semisecure webserver? Press ctrl-c to stop hosting when you're done. (y/n) ")
+        if whether == "y":
+            os.system("cd saveData && python3 -m httpServer.py 8000")
+        if whether == "n":
+            print("rip")
+        else:
+            print("invalid input")
+            secure()
+
+    secure()
+
+
+
+def setAdvanced():
+    advanced = True
+    for widget in wind.winfo_children():
+        widget.destroy()
+
+    inputs = tk.Label(wind, text="Input shape (no. of input parameters)?")
+    inputs.pack()
+
+    inputEntry = tk.Entry(wind)
+    inputEntry.pack()
+
+    outputs = tk.Label(wind, text="Output shape (no. of categories)?")
+    outputs.pack()
+
+    outputEntry = tk.Entry(wind)
+    outputEntry.pack()
+
+    patho = tk.Label(wind, text="Path to csv: ")
+    patho.pack()
+
+    pathoText = tk.Entry(wind)
+    pathoText.pack()
+
+    op = tk.Label(wind, text="Output column: ")
+    op.pack()
+
+    opt = tk.Entry(wind)
+    opt.pack()
+
+    bat = tk.Label(wind, text="Batches: ")
+    bat.pack()
+
+    bate = tk.Entry(wind)
+    bate.pack()
+
+    epo = tk.Label(wind, text="Epoch #: ")
+    epo.pack()
+
+    epoe = tk.Entry(wind)
+    epoe.pack()
+
+    howMany = tk.Label(wind, text="How many hidden layers?")
+    howMany.pack()
+
+    howManyText = tk.Entry(wind)
+    howManyText.pack()
+
+    act = tk.Label(wind, text="Activation function: ")
+    act.pack()
+
+    acte = tk.Entry(wind)
+    acte.pack()
+
+
+    outN = tk.Label(wind, text="How many output neurons")
+    outN.pack()
+
+    outNT = tk.Entry(wind)
+    outNT.pack()
+
+    def finisha():
+        global finalOut, finalIn, finalPath, finalBatches, finalEpochs, howManyNeurons, activationFunc, outputNeurons, finalColumn, in_shape, out_shape, advanced, layers, apiModel
+        finalOut = outputEntry.get()
+        finalIn = inputEntry.get()
+        finalPath = pathoText.get()
+        finalBatches = bate.get()
+        finalEpochs = epoe.get()
+        howManyNeurons = howManyText.get()
+        activationFunc = acte.get()
+        finalColumn = opt.get()
+        outputNeurons = outNT.get()
+
+        def setIO():
+            global in_shape, out_shape  
+            in_shape = int(finalIn)
+            out_shape = int(finalOut)
+
+        def mainLoop():
+            global apiModel, advanced
+            name = "model"
+            if(in_shape == None or out_shape == None):
+                setIO()
+            if(advanced == None):
+                advanced = False
+            if(advanced == True):
+                layers.append(Input(in_shape))
+
+
+            if(advanced):
+                action = int(howManyNeurons)
+                if(action > 0):
+                    out_neurons = int(outputNeurons)
+                    activation = activationFunc            
+                    layers.append(Dense(out_neurons, activation=activation))
+                    mainLoop()
+                if(action <= 0):
+                    layers.append(Dense(out_shape, activation="sigmoid"))
+                    apiModel.model = Sequential(layers) 
+            else:
+                
+                if(isSimple):
+                    apiModel.model = templates.classifier_small(in_shape, out_shape)
+                if(not isSimple):
+                    apiModel.model = templates.classifier_large(in_shape, out_shape)
+
+
+        mainLoop()
+
+        x_train, y_train = None, None
+
+        def csvProcess():
+            global x_train, y_train
+            path = finalPath
+            out = finalColumn
+            print(colorize(path, RED))
+            print(colorize(out, RED))
+
+            y_train = rc.toHotEncodes(path, out)
+            x_train = rc.readInputs(path, out)
+
+
+        csvProcess()
+
+        def train():
+            global x_train, y_train
+            #if(advanced):
+            batch_size = int(finalBatches)
+            epochs = int(finalEpochs)
+
+            apiModel.train(x_train, y_train, batch_size=batch_size, epochs=epochs)
+            print("training done")
+
+        train()
+        print("training done")
+
+        co = os.listdir(os.getcwd() + "/" + "saveData")
+
+        for i in co:
+            if i != "httpServer.py":
+                os.remove(os.getcwd()+"/"+"saveData/"+i)
+                    
+        apiModel.model.save("saveData/model.h5")
+
+
         
-apiModel.model.save("saveData/model.h5")
 
-def secure():
-    whether = input("Do you want to host this on a semisecure webserver? Press ctrl-c to stop hosting when you're done. (y/n) ")
-    if whether == "y":
-        os.system("cd saveData && python3 -m httpServer.py 8000")
-    if whether == "n":
-        print("rip")
-    else:
-        print("invalid input")
+        def secure():
+            whether = input("Do you want to host this on a semisecure webserver? Press ctrl-c to stop hosting when you're done. (y/n) ")
+            if whether == "y":
+                os.system("cd saveData && python3 -m httpServer.py 8000")
+            if whether == "n":
+                print("rip")
+            else:
+                print("invalid input")
+                secure()
+
         secure()
 
-secure()
+    finalBtn = tk.Button(wind, text="Generate", command=finisha)
+    finalBtn.pack()
+
+
+
+btn = tk.Button(wind, text = 'Make Advanced?', bd = '5', command=setAdvanced)
+btn.pack()
+
+
+
+finalBtn = tk.Button(wind, text="Generate", command=finish)
+finalBtn.pack()
+
+wind.mainloop()
+
+
+        
+
+
+
+
+
