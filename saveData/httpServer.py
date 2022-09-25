@@ -1,3 +1,6 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+
 import http.server
 from socket import socket
 import socketserver
@@ -5,7 +8,7 @@ import socketserver
 from tensorflow import keras
 import numpy as np
 
-#model = keras.models.load(input("model path: "))) 
+model = "model.h5"
 
 class httpServer:
     def __init__(self, port=8000, handler=None):
@@ -31,6 +34,7 @@ class selfHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
+
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
@@ -39,13 +43,19 @@ class selfHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(bytes("<html><head><title>Title goes here.</title></head>", "utf-8"))
         self.wfile.write(bytes("<body><p>This is a test.</p></body></html>", "utf-8"))
         self.wfile.close()
+
     def do_POST(self):
         body_inf = int(self.headers.get('Content-Length'))
         body = self.rfile.read(body_inf)
-        print("body", body.split(b" "))
-        arr = np.array(body.split(b" "))
-        arr = arr.astype(np.float)
-        print(arr)
+        print("body", body.decode("utf-8"))
+        arr = np.fromstring(body.decode("utf-8"), dtype=np.float32, sep=" ")
+        arr = np.expand_dims(arr, axis=0)
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain")
+        self.end_headers()
+        self.wfile.write(bytes(np.array2string(model.predict(arr), separator=" "), "utf-8"))
+        self.wfile.close()
+        print(np.array2string(model.predict(arr), separator=" "))
 
 
 try:
