@@ -1,5 +1,6 @@
 
 
+
 import os
 import pandas as pd
 import readCsv as rc
@@ -98,6 +99,13 @@ def train():
     apiModel.train(x_train, y_train, batch_size=batch_size, epochs=epochs)
 
 train()
+
+co = os.listdir(os.getcwd() + "/" + "saveData")
+
+for i in co:
+    if i != "httpServer.py":
+        os.remove(i)
+        
 apiModel.model.save("saveData/model.h5")
 
 def secure():
