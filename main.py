@@ -8,6 +8,7 @@ import pandas as pd
 import readCsv as rc
 import modelapi
 import templates
+
 import tensorflow
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.models import Sequential
@@ -261,6 +262,10 @@ def setAdvanced():
             print(widgets)
 
 
+    finalBtn = tk.Button(wind, text="Generate")
+    finalBtn.pack()
+
+
 
     inputs = tk.Label(wind, text="Input shape (no. of input parameters)?")
     inputs.pack()
@@ -320,8 +325,13 @@ def setAdvanced():
     outNT = tk.Entry(wind)
     outNT.pack()
 
+    
+
+    
+
     def finisha():
-        global finalOut, finalIn, finalPath, finalBatches, finalEpochs, howManyNeurons, activationFunc, outputNeurons, finalColumn, in_shape, out_shape, advanced, layers, apiModel
+        global finalOut, finalIn, finalPath, finalBatches, finalEpochs, howManyNeurons, activationFunc, outputNeurons, finalColumn, in_shape, out_shape, advanced, layers, apiModel 
+        
         finalOut = outputEntry.get()
         finalIn = inputEntry.get()
         finalPath = pathoText.get()
@@ -331,6 +341,8 @@ def setAdvanced():
         activationFunc = acte.get()
         finalColumn = opt.get()
         outputNeurons = outNT.get()
+
+        
 
         def setIO():
             global in_shape, out_shape  
@@ -350,12 +362,14 @@ def setAdvanced():
 
             if(advanced):
                 action = int(howManyNeurons)
-                if(action > 0):
-                    out_neurons = int(outputNeurons)
+                if(len(widgets) > 0):
+                    
                     activation = activationFunc            
-                    layers.append(Dense(out_neurons, activation=activation))
+                    for i in range(len(widgets)):
+                        out_neurons = widgets.ElementAt(i).key.get()
+                        layers.append(Dense(out_neurons, activation=activation))
                     mainLoop()
-                if(action <= 0):
+                if(len(widgets) <= 0):
                     layers.append(Dense(out_shape, activation="sigmoid"))
                     apiModel.model = Sequential(layers) 
             else:
@@ -365,8 +379,9 @@ def setAdvanced():
                 if(not isSimple):
                     apiModel.model = templates.classifier_large(in_shape, out_shape)
 
-
+        
         mainLoop()
+        
 
         x_train, y_train = None, None
 
@@ -398,12 +413,16 @@ def setAdvanced():
         co = os.listdir(os.getcwd() + "/" + "saveData")
 
         for i in co:
-            if i != "httpServer.py":
+            if i != "httpServer.py" and i != "__pycache__":
                 os.remove(os.getcwd()+"/"+"saveData/"+i)
                     
         apiModel.model.save("saveData/model.h5")
 
         createWindow()
+
+    finalBtn.configure(command=finisha)
+
+        
 
 
         
@@ -420,8 +439,7 @@ def setAdvanced():
 
         # secure()
 
-    finalBtn = tk.Button(wind, text="Generate", command=finisha)
-    finalBtn.pack()
+    
 
 
 
