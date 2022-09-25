@@ -93,7 +93,7 @@ op.pack()
 opt = tk.Entry(wind)
 opt.pack()
 
-bat = tk.Label(wind, text="Batches: ")
+bat = tk.Label(wind, text="Batch size: ")
 bat.pack()
 
 bate = tk.Entry(wind)
@@ -105,10 +105,7 @@ epo.pack()
 epoe = tk.Entry(wind)
 epoe.pack()
 
-howMany = tk.Label(wind, text="How many hidden layers?")
-howMany.pack()
-howManyText = tk.Entry(wind)
-howManyText.pack()
+
 
 act = tk.Label(wind, text="Activation function: ")
 act.pack()
@@ -143,11 +140,11 @@ def finish():
     finalPath = pathoText.get()
     finalBatches = bate.get()
     finalEpochs = epoe.get()
-    howManyNeurons = howManyText.get()
+    # howManyNeurons = howManyText.get()
     activationFunc = acte.get()
     finalColumn = opt.get()
     isSimple = bool(amogus.get())
-    outputNeurons = outNT.get()
+    # outputNeurons = outNT.get()
     
 
     def setIO():
@@ -291,7 +288,7 @@ def setAdvanced():
     opt = tk.Entry(wind)
     opt.pack()
 
-    bat = tk.Label(wind, text="Batches: ")
+    bat = tk.Label(wind, text="Batch size: ")
     bat.pack()
 
     bate = tk.Entry(wind)
@@ -303,14 +300,14 @@ def setAdvanced():
     epoe = tk.Entry(wind)
     epoe.pack()
 
-    howMany = tk.Label(wind, text="How many hidden layers?")
-    howMany.pack()
+    # howMany = tk.Label(wind, text="How many hidden layers?")
+    # howMany.pack()
 
     addMore = tk.Button(wind, text="Add hidden layer", bd = 6, command=addAnother)
     addMore.pack()
 
-    howManyText = tk.Entry(wind)
-    howManyText.pack()
+    # howManyText = tk.Entry(wind)
+    # howManyText.pack()
 
     act = tk.Label(wind, text="Activation function: ")
     act.pack()
@@ -319,11 +316,11 @@ def setAdvanced():
     acte.pack()
 
 
-    outN = tk.Label(wind, text="How many output neurons")
-    outN.pack()
+    # outN = tk.Label(wind, text="How many output neurons")
+    # outN.pack()
 
-    outNT = tk.Entry(wind)
-    outNT.pack()
+    # outNT = tk.Entry(wind)
+    # outNT.pack()
 
     
 
@@ -337,10 +334,10 @@ def setAdvanced():
         finalPath = pathoText.get()
         finalBatches = bate.get()
         finalEpochs = epoe.get()
-        howManyNeurons = howManyText.get()
+        # howManyNeurons = howManyText.get()
         activationFunc = acte.get()
         finalColumn = opt.get()
-        outputNeurons = outNT.get()
+        # outputNeurons = outNT.get()
 
         
 
