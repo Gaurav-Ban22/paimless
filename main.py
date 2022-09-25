@@ -216,7 +216,7 @@ def finish():
     co = os.listdir(os.getcwd() + "/" + "saveData")
 
     for i in co:
-        if i != "httpServer.py":
+        if i != "httpServer.py" and i != "__pycache__":
             os.remove(os.getcwd()+"/"+"saveData/"+i)
                 
     apiModel.model.save("saveData/model.h5")
