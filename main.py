@@ -102,7 +102,7 @@ co = os.listdir(os.getcwd() + "/" + "saveData")
 
 for i in co:
     if i != "httpServer.py":
-        os.remove(i)
+        os.remove(os.getcwd()+"/"+"saveData/"+i)
         
 apiModel.model.save("saveData/model.h5")
 
