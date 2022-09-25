@@ -8,7 +8,7 @@ import socketserver
 from tensorflow import keras
 import numpy as np
 
-model = "model.h5"
+model = keras.models.load_model("model.h5")
 
 class httpServer:
     def __init__(self, port=8000, handler=None):
@@ -60,8 +60,8 @@ class selfHandler(http.server.BaseHTTPRequestHandler):
 
 try:
     serv = httpServer(8080, selfHandler)
+    print("starting server...")
     serv.start()
 except KeyboardInterrupt:
     print(" Keyboard interrupt; stopping server")
     serv.stop()
-    
