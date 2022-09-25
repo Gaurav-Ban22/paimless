@@ -3,6 +3,7 @@
 from ast import fix_missing_locations
 from optparse import BadOptionError
 import os
+from venv import create
 import pandas as pd
 import readCsv as rc
 import modelapi
@@ -39,12 +40,13 @@ howManyNeurons = 0
 activationFunc = "sigmoid"
 outputNeurons = 0
 finalColumn = ""
+amogus = None
 
 isSimple = True
 
 wind = tk.Tk()
 wind.title("Paimless Neural Network Generator")
-wind.geometry('500x600')
+wind.geometry('500x1000')
 
 def colorize(text, color):
     return color + text + RESET
@@ -70,8 +72,13 @@ outputs.pack()
 outputEntry = tk.Entry(wind)
 outputEntry.pack()
 
-chooseTemplate = tk.Button(wind, text="Switch template (starts at simple)", command=switch)
-chooseTemplate.pack()
+dropDownt = tk.Label(wind, text="Do you want to use a simple or advanced model? (true = yes, false = no)")
+dropDownt.pack()
+
+zo = ["True", "False"]
+amogus = tk.StringVar(wind, "true")
+dropDown = tk.OptionMenu(wind, amogus, *zo)
+dropDown.pack()
 
 patho = tk.Label(wind, text="Path to csv: ")
 patho.pack()
@@ -114,8 +121,22 @@ outN.pack()
 
 outNT = tk.Entry(wind)
 outNT.pack()
+
+def turnIntoServer():
+    os.system("cd saveData && python3 -m httpServer.py 8000")
+
+
+def createWindow():
+    window = tk.Toplevel(wind)
+    window.title("Advanced")
+    window.geometry("500x500")
+    window.grab_set()
+
+    btnp = tk.Button(window, text = 'Turn into server?', bd = '10', command=turnIntoServer)
+    btnp.pack()
+
 def finish():
-    global finalOut, finalIn, finalPath, finalBatches, finalEpochs, howManyNeurons, activationFunc, outputNeurons, finalColumn, in_shape, out_shape, advanced, layers, apiModel
+    global finalOut, finalIn, finalPath, finalBatches, finalEpochs, howManyNeurons, activationFunc, outputNeurons, finalColumn, in_shape, out_shape, advanced, layers, apiModel, isSimple, amogus
     finalOut = outputEntry.get()
     finalIn = inputEntry.get()
     finalPath = pathoText.get()
@@ -124,7 +145,9 @@ def finish():
     howManyNeurons = howManyText.get()
     activationFunc = acte.get()
     finalColumn = opt.get()
+    isSimple = bool(amogus.get())
     outputNeurons = outNT.get()
+    
 
     def setIO():
         global in_shape, out_shape  
@@ -197,27 +220,47 @@ def finish():
                 
     apiModel.model.save("saveData/model.h5")
 
+    createWindow()
+
 
     
 
-    def secure():
-        whether = input("Do you want to host this on a semisecure webserver? Press ctrl-c to stop hosting when you're done. (y/n) ")
-        if whether == "y":
-            os.system("cd saveData && python3 -m httpServer.py 8000")
-        if whether == "n":
-            print("rip")
-        else:
-            print("invalid input")
-            secure()
+    # def secure():
+    #     whether = input("Do you want to host this on a semisecure webserver? Press ctrl-c to stop hosting when you're done. (y/n) ")
+    #     if whether == "y":
+    #         os.system("cd saveData && python3 -m httpServer.py 8000")
+    #     if whether == "n":
+    #         print("rip")
+    #     else:
+    #         print("invalid input")
+    #         secure()
 
-    secure()
-
+    # secure()
 
 
 def setAdvanced():
+    widgets = {}
     advanced = True
     for widget in wind.winfo_children():
         widget.destroy()
+
+    def addAnother():
+        def delete(object, objecttwo):
+            object.destroy()
+            objecttwo.destroy()
+            if len(widgets) > 0:
+                widgets.popitem()
+
+        if len(widgets) < 9:
+            widget = tk.Entry(wind)
+            widget.pack()
+            widgettwo = tk.Button(wind, text="Delete")
+            widgettwo.pack()
+            widgets[widget] = widgettwo
+            widgettwo.configure(command=lambda: delete(widget, widgettwo))
+            print(widgets)
+
+
 
     inputs = tk.Label(wind, text="Input shape (no. of input parameters)?")
     inputs.pack()
@@ -257,6 +300,9 @@ def setAdvanced():
 
     howMany = tk.Label(wind, text="How many hidden layers?")
     howMany.pack()
+
+    addMore = tk.Button(wind, text="Add hidden layer", bd = 6, command=addAnother)
+    addMore.pack()
 
     howManyText = tk.Entry(wind)
     howManyText.pack()
@@ -357,20 +403,22 @@ def setAdvanced():
                     
         apiModel.model.save("saveData/model.h5")
 
+        createWindow()
+
 
         
 
-        def secure():
-            whether = input("Do you want to host this on a semisecure webserver? Press ctrl-c to stop hosting when you're done. (y/n) ")
-            if whether == "y":
-                os.system("cd saveData && python3 -m httpServer.py 8000")
-            if whether == "n":
-                print("rip")
-            else:
-                print("invalid input")
-                secure()
+        # def secure():
+        #     whether = input("Do you want to host this on a semisecure webserver? Press ctrl-c to stop hosting when you're done. (y/n) ")
+        #     if whether == "y":
+        #         os.system("cd saveData && python3 -m httpServer.py 8000")
+        #     if whether == "n":
+        #         print("rip")
+        #     else:
+        #         print("invalid input")
+        #         secure()
 
-        secure()
+        # secure()
 
     finalBtn = tk.Button(wind, text="Generate", command=finisha)
     finalBtn.pack()
@@ -384,6 +432,11 @@ btn.pack()
 
 finalBtn = tk.Button(wind, text="Generate", command=finish)
 finalBtn.pack()
+
+
+
+
+
 
 wind.mainloop()
 
