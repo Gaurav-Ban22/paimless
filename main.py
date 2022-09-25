@@ -1,6 +1,7 @@
 
 
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 import pandas as pd
 import readCsv as rc
 import modelapi
@@ -54,7 +55,6 @@ def mainLoop():
         else:
             advanced = True
             layers.append(Input(in_shape))
-            apiModel.model = Sequential(layers)
 
     if(advanced):
         action = input("[a]dd hidden layer, [b]egin")
@@ -65,6 +65,7 @@ def mainLoop():
             mainLoop()
         if(action == "b"):
             layers.append(Dense(out_shape, activation="sigmoid"))
+            apiModel.model = Sequential(layers)
     else:
         print("what template do you want to use? (classifier_small[1], classifier_large[2])")
         template = input()
