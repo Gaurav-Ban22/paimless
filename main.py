@@ -1,6 +1,5 @@
 
 
-
 import os
 import pandas as pd
 import readCsv as rc
@@ -55,6 +54,7 @@ def mainLoop():
         else:
             advanced = True
             layers.append(Input(in_shape))
+            apiModel.model = Sequential(layers)
 
     if(advanced):
         action = input("[a]dd hidden layer, [b]egin")
@@ -77,8 +77,6 @@ def mainLoop():
 mainLoop()
 
 x_train, y_train = None, None
-
-apiModel.model = Sequential(layers)
 
 def csvProcess():
     global x_train, y_train
